@@ -9,10 +9,11 @@ namespace Orders.Schema
     public class OrderSchema : GraphQL.Types.Schema
     {
         public OrderSchema(OrdersQuery query, OrdersMutation mutation,
-            IDependencyResolver resolver)
+            OrdersSubscription subscription, IDependencyResolver resolver)
         {
             Query = query;
             Mutation = mutation;
+            Subscription = subscription;
             DependencyResolver = resolver;
         }
     }

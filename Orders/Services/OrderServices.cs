@@ -10,8 +10,10 @@ namespace Orders.Services
     public class OrderServices : IOrderService
     {
         private IList<Order> _orders;
-        public OrderServices()
+        private readonly IOrderEventService _events;
+        public OrderServices(IOrderEventService events)
         {
+            _events = events;
             _orders = new List<Order>();
             _orders.Add(new Order("1000", "250 Conference brochures", DateTime.Now, 1, "FAEBD970-CBA5-4CED-8AD5-5CC0B8D4B7827"));
             _orders.Add(new Order("2000", "250 t-shirts", DateTime.Now.AddHours(1), 2, "F43A1F6D-4AE9-4A19-93D9-2018387D5378"));
@@ -33,6 +35,9 @@ namespace Orders.Services
         public Task<Order> CreateAsync(Order order)
         {
             _orders.Add(order);
+            var orderEvent = new OrderEvent(order.Id, order.Name, OrderStatuses.CREATED, DateTime.Now);
+            _events.AddEvent(orderEvent);
+
             return Task.FromResult(order);
         }
 
@@ -50,6 +55,9 @@ namespace Orders.Services
         {
             var order = GetById(orderId);
             order.Start();
+            var orderEvent = new OrderEvent(order.Id, order.Name, OrderStatuses.PROCESSING, DateTime.Now);
+            _events.AddEvent(orderEvent);
+
             return Task.FromResult(order);
         }
     }
